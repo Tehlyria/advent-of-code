@@ -1,4 +1,4 @@
-module ``01``
+module ``Day01``
 
 open System
 open System
