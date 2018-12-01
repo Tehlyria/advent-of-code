@@ -1,7 +1,6 @@
 module ``Day01``
 
 open System
-open System
 open System.Collections.Generic
 open System.IO
 open System.Net
@@ -33,7 +32,12 @@ let partTwo (inputList: int list): int =
 
 [<EntryPoint>]
 let main argv =
-    let inputList = readFile "Day01/input.txt" |> List.ofSeq |> List.map (fun e -> printf "%s\n" e; int(e))
+#if INTERACTIVE
+    let path = __SOURCE_DIRECTORY__ + "/input.txt"
+#else
+    let path = "input.txt"
+#endif
+    let inputList = readFile path |> List.ofSeq |> List.map (int)
     printf "Part One: %d\n" (partOne inputList)
     printf "Part Two: %d\n" (partTwo inputList)
     0
