@@ -3,3 +3,4 @@
 My solutions to this year's [AdventOfCode](https://adventofcode.com/) in F#.
 
 - ~~Day 1~~
+- ~~Day 2~~
