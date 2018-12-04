@@ -1,8 +1,8 @@
 open Utils
 
-let partOne (inputList: int list): int = List.sum inputList
+let partOne inputList = List.sum inputList
 
-let partTwo (inputList: int list): int =
+let partTwo inputList =
     let mutable visitedSet = Set.empty.Add(0)
     let mutable result = 0
 

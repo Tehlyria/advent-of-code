@@ -38,8 +38,8 @@ let partOne inp =
 let partTwo inp =
     let lst = inp
             |> Map.toList 
-            |> List.map (fun elem -> snd elem)
-            |> List.groupBy (fun elem -> snd elem)
+            |> List.map (snd)
+            |> List.groupBy (snd)
     
     seq { 1 .. Seq.length inp }
     |> Seq.filter (fun e ->

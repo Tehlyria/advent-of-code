@@ -48,7 +48,7 @@ let findSleepiestGuard inp =
                             )
         (fst elem, totalDuration)
     )
-    |> List.maxBy (fun elem -> snd elem)
+    |> List.maxBy (snd)
     
     
 let mapToMinute (acc: Map<int, int>) elem = 
@@ -109,9 +109,7 @@ let partTwo inp =
     ) []        
     |> List.sortByDescending (snd << snd)
     |> List.distinct
-    |> List.map (fun elem -> 
-        (fst elem) * fst (snd elem)
-    )       
+    |> List.map (fun elem -> fst elem * (fst << snd) elem)       
     |> List.head
 
 [<EntryPoint>]
