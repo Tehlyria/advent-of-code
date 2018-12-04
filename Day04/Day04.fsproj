@@ -13,4 +13,8 @@
       <Content Include="input.txt" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Utils\Utils.fsproj" />
+    </ItemGroup>
+
 </Project>

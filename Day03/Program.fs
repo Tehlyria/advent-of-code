@@ -1,21 +1,6 @@
-﻿module ``Day03``
+﻿open Utils
 
-let readFile (filePath: string) = seq {
-    use sr = new System.IO.StreamReader(filePath)
-    while not sr.EndOfStream do
-        yield sr.ReadLine()
-}
-
-
-let (|Regex|_|) pattern inp =
-    let m = System.Text.RegularExpressions.Regex.Match(inp, pattern)
-    if m.Success then 
-        Some (List.tail [ for g in m.Groups -> g.Value ])
-    else
-        None
-
-type Element =
-    Node of int * int * int
+type Element = Node of int * int * int
     
 let coords h w = seq {
     for y in 0 .. h - 1 do 
@@ -25,7 +10,7 @@ let coords h w = seq {
 
 let parseLines inp st =
     match inp with 
-    | Regex @"#([0-9]+)\s@\s([0-9]+),([0-9]+):\s+([0-9]+)x([0-9]+)" [id; left; top; width; height] ->
+    | Utility.Regex @"#([0-9]+)\s@\s([0-9]+),([0-9]+):\s+([0-9]+)x([0-9]+)" [id; left; top; width; height] ->
         let id = int id
         let left = int left
         let top = int top
@@ -44,7 +29,6 @@ let parseLines inp st =
         ) st
     | _ -> 
         st
-        
         
 let partOne inp =
     inp
@@ -66,9 +50,6 @@ let partTwo inp =
     )
     |> Seq.head
             
-                
-
-
 [<EntryPoint>]
 let main argv =
 #if INTERACTIVE
@@ -76,7 +57,7 @@ let main argv =
 #else
     let path = "input.txt"
 #endif
-    let inp = readFile path |> Seq.fold (fun acc elem -> parseLines elem acc) Map.empty
+    let inp = Utility.readFile path |> Seq.fold (fun acc elem -> parseLines elem acc) Map.empty
     inp |> partOne |> printf "Part One: %d\n"
     inp |> partTwo |> printf "Part Two: %d\n"
     0

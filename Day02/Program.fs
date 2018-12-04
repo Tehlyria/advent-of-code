@@ -1,12 +1,4 @@
-﻿module ``Day02``
-
-open System
-
-let readFile (filePath: string) = seq {
-    use sr = new System.IO.StreamReader(filePath)
-    while not sr.EndOfStream do
-        yield sr.ReadLine()
-}
+﻿open Utils
 
 let hasPairOfSize (chSize: int) (inp: string) =
     inp.ToCharArray() 
@@ -60,7 +52,7 @@ let main argv =
 #else
     let path = "input.txt"
 #endif
-    let inputList = readFile path |> List.ofSeq
+    let inputList = Utility.readFile path |> List.ofSeq
     inputList |> partOne |> printf "Part One: %d\n"
     inputList |> partTwo |> printf "Part Two: %s\n"
     0

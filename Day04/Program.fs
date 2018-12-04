@@ -1,17 +1,4 @@
-﻿module ``Day04``
-
-let readFile (filePath: string) = seq {
-    use sr = new System.IO.StreamReader(filePath)
-    while not sr.EndOfStream do
-        yield sr.ReadLine()
-}
-
-let (|Regex|_|) pattern inp =
-    let m = System.Text.RegularExpressions.Regex.Match(inp, pattern)
-    if m.Success then 
-        Some (List.tail [ for g in m.Groups -> g.Value ])
-    else
-        None
+﻿open Utils
         
 // ID * Month * Day * Hour * Minute
 type Event =
@@ -20,33 +7,15 @@ type Event =
     | WakeUp        of int * int * int * int * int 
     
 // ID * Month * Day * H_Start * M_Start * Duration    
-type Sleep =    
-    | SleepDuration of int * int * int * int * int * int
+type Sleep = SleepDuration of int * int * int * int * int * int
 
-let parseLines inp =
-    match inp with 
-    | Regex @"\[[0-9]{4}\-([0-9]{2})\-([0-9]{2})\s+([0-9]{2}):([0-9]{2})\]\s.*#([0-9]+)" [month; day; hour; minute; id] ->
-        let month = int month
-        let day = int day
-        let hour = int hour
-        let min = int minute
-        let id = int id
-        
-        ShiftStart(id, month, day, hour, min)
-    | Regex @"\[[0-9]{4}\-([0-9]{2})\-([0-9]{2})\s+([0-9]{2}):([0-9]{2})\]\s.*falls" [month; day; hour; minute] ->
-        let month = int month
-        let day = int day
-        let hour = int hour
-        let min = int minute
-        
-        FallAsleep(0, month, day, hour, min)
-    | Regex @"\[[0-9]{4}\-([0-9]{2})\-([0-9]{2})\s+([0-9]{2}):([0-9]{2})\]\s.*wakes" [month; day; hour; minute] ->
-        let month = int month
-        let day = int day
-        let hour = int hour
-        let min = int minute
-        
-        WakeUp(0, month, day, hour, min)
+let parseLines = function
+    | Utility.Regex @"\[[0-9]{4}\-([0-9]{2})\-([0-9]{2})\s+([0-9]{2}):([0-9]{2})\]\s.*#([0-9]+)" [month; day; hour; minute; id] ->
+        ShiftStart(int id, int month, int day, int hour, int minute)
+    | Utility.Regex @"\[[0-9]{4}\-([0-9]{2})\-([0-9]{2})\s+([0-9]{2}):([0-9]{2})\]\s.*falls" [month; day; hour; minute] ->
+        FallAsleep(0, int month, int day, int hour, int minute)
+    | Utility.Regex @"\[[0-9]{4}\-([0-9]{2})\-([0-9]{2})\s+([0-9]{2}):([0-9]{2})\]\s.*wakes" [month; day; hour; minute] ->
+        WakeUp(0, int month, int day, int hour, int minute)
     | _ -> 
         failwith "Could not parse line!"
 
@@ -125,7 +94,6 @@ let getAllEvents inp =
     ) []
     |> List.rev
             
-        
 let partOne inp =
     let sleepDurs = inp |> getAllEvents |> getSleepDurations
     
@@ -160,7 +128,7 @@ let main argv =
 #else
     let path = "input.txt"
 #endif
-    let inp = readFile path |> Seq.sort |> Seq.toList
+    let inp = Utility.readFile path |> Seq.sort |> Seq.toList
     inp |> partOne |> printf "Part One: %d\n"
     inp |> partTwo |> printf "Part Two: %d\n"
-    0 // return an integer exit code
+    0

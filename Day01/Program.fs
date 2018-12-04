@@ -1,15 +1,4 @@
-module ``Day01``
-
-open System
-open System.Collections.Generic
-open System.IO
-open System.Net
-
-let readFile (filePath: string) = seq {
-    use sr = new System.IO.StreamReader(filePath)
-    while not sr.EndOfStream do
-        yield sr.ReadLine()
-}
+open Utils
 
 let partOne (inputList: int list): int = List.sum inputList
 
@@ -37,7 +26,7 @@ let main argv =
 #else
     let path = "input.txt"
 #endif
-    let inputList = readFile path |> List.ofSeq |> List.map (int)
+    let inputList = Utility.readFile path |> List.ofSeq |> List.map (int)
     printf "Part One: %d\n" (partOne inputList)
     printf "Part Two: %d\n" (partTwo inputList)
     0
