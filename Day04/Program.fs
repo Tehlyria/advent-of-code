@@ -98,38 +98,60 @@ let expandSleepDuration acc elem =
         SleepDuration(id, m, d, H, e, D) :: a        
     ) acc              
         
-let partOne inp =
-    let mutable currentID = -1
-    let events = inp
-                    |> List.fold (fun acc elem ->
-                        match parseLines elem with 
-                        | ShiftStart(id, m, d, H, M) ->
-                            currentID <- id
-                            ShiftStart(id, m, d, H, M) :: acc
-                        | WakeUp(_, m, d, H, M) ->
-                            WakeUp(currentID, m, d, H, M) :: acc
-                        | FallAsleep(_, m, d, H, M) ->
-                            FallAsleep(currentID, m, d, H, M) :: acc           
-                    ) []
-                    |> List.rev
-                
-    let sleepDurs = events |> getSleepDurations
-    
-    let sleepiestGuard = sleepDurs |> findSleepiestGuard |> fst
+let mostSleptMinute guardID sleepDurs =
     sleepDurs
     |> List.filter (fun elem -> 
         match elem with 
-        | SleepDuration(id, _, _, _, _, _) when id = sleepiestGuard -> true
+        | SleepDuration(id, _, _, _, _, _) when id = guardID -> true
         | _ -> false 
     )
     |> List.fold (expandSleepDuration) []
     |> List.fold (mapToMinute) Map.empty
     |> Map.toList
     |> List.maxBy (snd)
+    
+let getAllEvents inp =    
+    let mutable currentID = -1
+    inp
+    |> List.fold (fun acc elem ->
+        match parseLines elem with 
+        | ShiftStart(id, m, d, H, M) ->
+            currentID <- id
+            ShiftStart(id, m, d, H, M) :: acc
+        | WakeUp(_, m, d, H, M) ->
+            WakeUp(currentID, m, d, H, M) :: acc
+        | FallAsleep(_, m, d, H, M) ->
+            FallAsleep(currentID, m, d, H, M) :: acc           
+    ) []
+    |> List.rev
+            
+        
+let partOne inp =
+    let sleepDurs = inp |> getAllEvents |> getSleepDurations
+    
+    let sleepiestGuard = sleepDurs |> findSleepiestGuard |> fst
+    mostSleptMinute sleepiestGuard sleepDurs
     |> (fun m -> sleepiestGuard * fst m)
     
 let partTwo inp =
-    0    
+    let sleepDurs = inp |> getAllEvents |> getSleepDurations
+    sleepDurs
+    |> List.map (fun elem -> 
+        let (SleepDuration(id, m, d, H, M, D)) = elem
+        id
+    )
+    |> List.fold (fun acc id ->
+        let m = mostSleptMinute id sleepDurs
+        (id, m) :: acc
+    ) []        
+    |> List.sortByDescending (fun elem ->
+        snd elem |> snd
+    )
+    |> List.distinct
+    |> List.map (fun elem -> 
+        (fst elem) * fst (snd elem)
+    )       
+    |> List.head
 
 [<EntryPoint>]
 let main argv =
