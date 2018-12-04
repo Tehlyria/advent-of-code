@@ -30,25 +30,23 @@ let getSleepDurations inp =
     |> List.fold (fun acc elem ->
         let (FallAsleep(id, m, d, H, M)) = List.item 0 elem
         let (WakeUp(_, _, _, _, M2)) = List.item 1 elem
-        
         SleepDuration(id, m, d, H, M, M2 - M - 1) :: acc
     ) []               
     |> List.rev
             
 let findSleepiestGuard inp =
     inp           
-    |> List.groupBy (fun elem ->
-        match elem with 
+    |> List.groupBy (fun elem -> 
+        match elem with
         | SleepDuration(id, _, _, _, _, _) -> id
     )
     |> List.map (fun elem ->
-        let id = fst elem
         let totalDuration = snd elem
-                            |> List.fold (fun acc elem -> 
-                                match elem with 
-                                | SleepDuration(_, _, _, _, _, d) -> acc + d
-                            ) 0
-        (id, totalDuration)
+                            |> List.sumBy (fun elem -> 
+                                match elem with
+                                | SleepDuration(_, _, _, _, _, d) -> d
+                            )
+        (fst elem, totalDuration)
     )
     |> List.maxBy (fun elem -> snd elem)
     
@@ -63,16 +61,13 @@ let expandSleepDuration acc elem =
     let (SleepDuration(id, m, d, H, M, D)) = elem
         
     seq { M .. M + D }        
-    |> Seq.fold (fun a e ->
-        SleepDuration(id, m, d, H, e, D) :: a        
-    ) acc              
+    |> Seq.fold (fun a e -> SleepDuration(id, m, d, H, e, D) :: a) acc              
         
 let mostSleptMinute guardID sleepDurs =
     sleepDurs
     |> List.filter (fun elem -> 
-        match elem with 
-        | SleepDuration(id, _, _, _, _, _) when id = guardID -> true
-        | _ -> false 
+        let (SleepDuration(id, _, _, _, _, _)) = elem
+        id = guardID
     )
     |> List.fold (expandSleepDuration) []
     |> List.fold (mapToMinute) Map.empty
@@ -96,25 +91,23 @@ let getAllEvents inp =
             
 let partOne inp =
     let sleepDurs = inp |> getAllEvents |> getSleepDurations
-    
     let sleepiestGuard = sleepDurs |> findSleepiestGuard |> fst
-    mostSleptMinute sleepiestGuard sleepDurs
+    
+    mostSleptMinute sleepiestGuard sleepDurs 
     |> (fun m -> sleepiestGuard * fst m)
     
 let partTwo inp =
     let sleepDurs = inp |> getAllEvents |> getSleepDurations
     sleepDurs
     |> List.map (fun elem -> 
-        let (SleepDuration(id, m, d, H, M, D)) = elem
+        let (SleepDuration(id, _, _, _, _, _)) = elem
         id
     )
     |> List.fold (fun acc id ->
         let m = mostSleptMinute id sleepDurs
         (id, m) :: acc
     ) []        
-    |> List.sortByDescending (fun elem ->
-        snd elem |> snd
-    )
+    |> List.sortByDescending (snd << snd)
     |> List.distinct
     |> List.map (fun elem -> 
         (fst elem) * fst (snd elem)
