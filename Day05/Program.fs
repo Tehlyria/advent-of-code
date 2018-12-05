@@ -1,12 +1,6 @@
 ﻿open Utils
 
-let react ((l: char), (r: char)): bool =
-    match (l, r) with
-    | (a, b) when a = System.Char.ToUpper(b) -> false 
-    | (a, b) when b = System.Char.ToUpper(a) -> false
-    | _ -> true
-  
-let addNextChar c =
+let duplicateWithCase c =
     if (System.Char.IsUpper(c)) then 
         String.concat "" [(string c); (string (System.Char.ToLower c))]
     else 
@@ -16,17 +10,32 @@ let addNextChar c =
 let filterPairs inp =
     seq { 'a' .. 'z' } 
     |> Seq.append (seq { 'A' .. 'Z' })
-    |> Seq.map (addNextChar)
+    |> Seq.map (duplicateWithCase)
     |> Seq.fold (fun (acc: string) elem -> acc.Replace(elem, "")) inp
 
 
-let rec partOne (inp: string) =
+let rec fullyReact inp =
     let result = filterPairs inp
     if (result.Equals(inp)) then 
         result.Length
     else 
-        partOne result        
-         
+        fullyReact result        
+
+
+let partOne = fullyReact
+
+
+let replaceAndReact (inp: string) (ch: string) =
+    inp.Replace(ch.ToLower(), "").Replace(ch.ToUpper(), "")
+    |> fullyReact
+    
+    
+let partTwo (inp: string) =
+    seq { 'a' .. 'z' }
+    |> Seq.map (string)
+    |> Seq.map (replaceAndReact inp)
+    |> Seq.min
+    
 
 [<EntryPoint>]
 let main argv =
@@ -37,4 +46,5 @@ let main argv =
 #endif
     let inp = Utility.readFile path |> Seq.head
     inp |> partOne |> printf "Part One: %d\n"
+    inp |> partTwo |> printf "Part Two: %d\n"
     0
