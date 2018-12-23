@@ -1,8 +1,5 @@
 ﻿open Utils
 
-open System
-open System.Net.NetworkInformation
-
 type ParsedLine = char * char
 
 let parseLines line =
